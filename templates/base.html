@@ -1,20 +1,26 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <title>{% block title %}NEWS SCRAPER{% endblock %}</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0d1023">
+  <title>{% block title %}AI News Intelligence{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-    <nav class="navbar">
-        <div class="container">
-            <h1 class="nav-title">NEWS SCRAPER</h1>
-            <a href="{{ url_for('home') }}" class="back-button">← Back</a>
-        </div>
-    </nav>
-
-    <main class="content">
-        {% block content %}{% endblock %}
-    </main>
+  <div class="orb orb-one"></div><div class="orb orb-two"></div>
+  <nav class="navbar">
+    <a class="brand" href="{{ url_for('home') }}"><span>✦</span> Briefly</a>
+    <div class="nav-actions">
+      <a href="{{ url_for('home') }}">Analyze news</a>
+      <button class="theme-toggle" type="button" aria-label="Toggle color theme">◐</button>
+    </div>
+  </nav>
+  <main>{% block content %}{% endblock %}</main>
+  <script src="{{ url_for('static', filename='app.js') }}"></script>
+  {% block scripts %}{% endblock %}
 </body>
 </html>

@@ -1,46 +1,26 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8" />
-    <title>MULTIPLE ARTICLE ANALYSIS</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
-</head>
-<body>
-   {% extends "base.html" %}
-
-{% block title %}Analysis Results - NEWS SCRAPERr{% endblock %}
-
+{% extends "base.html" %}
+{% block title %}Analysis — Briefly{% endblock %}
 {% block content %}
-<h1>🧠 NLP ANALYSIS FOR MULTIPLE ARTICLES</h1>
-
-{% if articles %}
-    {% for article in articles %}
-        {% if 'error' in article %}
-            <p>Error loading article at URL: {{ article.url }} — {{ article.error }}</p>
-        {% else %}
-            <div class="article">
-                <h2><a href="{{ article.url }}" target="_blank">{{ article.title }}</a></h2>
-                <p><strong>Summary:</strong> {{ article.summary }}</p>
-                <!-- <p><strong>Sentiment:</strong> Polarity: {{ article.sentiment.polarity }}, Subjectivity: {{ article.sentiment.subjectivity }}</p> -->
-               <p><strong>Sentiment:</strong></p>
-<ul>
-  <li>Polarity: {{ article.sentiment.polarity }} ({{ article.sentiment.polarity_label }})</li>
-  <li>Subjectivity: {{ article.sentiment.subjectivity }} ({{ article.sentiment.subjectivity_label }})</li>
-</ul>
-
-                <p><strong>Entities:</strong>
-                    {% for entity, label in article.entities %}
-                        <span class="entity">{{ entity }} ({{ label }})</span>{% if not loop.last %}, {% endif %}
-                    {% endfor %}
-                </p>
-            </div>
-        {% endif %}
-    {% endfor %}
+{% if article.error %}
+  <section class="error-page"><p class="eyebrow">Analysis unavailable</p><h1>We couldn't read<br><em>that article.</em></h1><p>{{ article.error }}</p><a class="primary-link" href="{{ url_for('home') }}">Try another link →</a>{% if article.details %}<details><summary>Technical details</summary><code>{{ article.details }}</code></details>{% endif %}</section>
 {% else %}
-    <p>No articles found.</p>
+<section class="result-shell">
+  <div class="result-header reveal">
+    <a class="back-link" href="{{ url_for('home') }}">← New analysis</a>
+    <div class="result-actions"><a href="{{ article.url }}" target="_blank" rel="noreferrer">Original ↗</a><a class="pdf-button" href="{{ url_for('download_report', result_id=result_id) }}">↓ Download PDF</a></div>
+    <p class="eyebrow">Article intelligence</p><h1>{{ article.title }}</h1>
+    <div class="article-meta"><span>{{ article.word_count }} words</span><i></i><span>{{ article.reading_time }} min read</span><i></i><span>{{ article.entities|length }} entities</span></div>
+  </div>
+  <div class="dashboard">
+    <article class="summary-card reveal"><div class="section-label">✦ The brief</div><h2>AI summary</h2><p>{{ article.summary }}</p></article>
+    <article class="sentiment-card reveal delay-1"><div class="section-label">Mood of the story</div><div class="score-ring"><strong>{{ '%+.2f'|format(article.sentiment.polarity) }}</strong><span>polarity</span></div><div><h2>{{ article.sentiment.polarity_label }}</h2><p>{{ article.sentiment.subjectivity_label }} · {{ '%.0f'|format(article.sentiment.subjectivity * 100) }}% subjective</p></div></article>
+    <article class="stats-card reveal delay-2"><div class="section-label">At a glance</div><div class="stat-grid"><div><strong>{{ article.word_count }}</strong><span>Words</span></div><div><strong>{{ article.char_count }}</strong><span>Characters</span></div><div><strong>{{ article.reading_time }}</strong><span>Minutes</span></div><div><strong>{{ article.keywords|length }}</strong><span>Keywords</span></div></div></article>
+    <article class="entities-card reveal"><div class="section-label">Who & what</div><h2>Named entities</h2><div class="chips">{% for entity in article.entities %}<span class="entity-chip"><b>{{ entity.label }}</b>{{ entity.text }}</span>{% else %}<p class="empty">No named entities were detected.</p>{% endfor %}</div></article>
+    <article class="keyword-card reveal delay-1"><div class="section-label">Key topics</div><h2>Keywords</h2><ol>{% for keyword in article.keywords %}<li><span>{{ keyword.text }}</span><i style="width: {{ (keyword.count / article.keywords[0].count * 100) if article.keywords else 0 }}%"></i><b>{{ keyword.count }}</b></li>{% else %}<p class="empty">No keywords were detected.</p>{% endfor %}</ol></article>
+    <article class="chart-card reveal delay-2"><div class="section-label">Data view</div><h2>Entity breakdown</h2><div class="chart-wrap"><canvas id="entityChart"></canvas></div></article>
+    {% if article.word_cloud %}<article class="cloud-card reveal"><div class="section-label">Language map</div><h2>Word cloud</h2><img src="data:image/png;base64,{{ article.word_cloud }}" alt="Word cloud created from the article text"></article>{% endif %}
+  </div>
+</section>
 {% endif %}
 {% endblock %}
-
-</body>
-</html>
-
+{% block scripts %}{% if not article.error %}<script src="https://cdn.jsdelivr.net/npm/chart.js"></script><script>window.entityChart = {{ article.entity_chart|tojson }};</script>{% endif %}{% endblock %}

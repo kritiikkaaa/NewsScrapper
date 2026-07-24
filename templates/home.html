@@ -1,22 +1,37 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>NEWS SCRAPER HOME</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-</head>
-<body>
-   {% extends "base.html" %}
-
-{% block title %}Home - News Scraper{% endblock %}
-
+{% extends "base.html" %}
+{% block title %}Briefly — AI News Intelligence{% endblock %}
 {% block content %}
-<h1>🔍 SCRAPE AND ANALYZE NEWS</h1>
-<form method="POST" action="{{ url_for('analyze') }}">
-    <label for="url">Enter a news article URL:</label><br>
-    <input type="text" name="url" id="url" placeholder="https://example.com/news" required>
-    <button type="submit">Analyze</button>
-</form>
+<section class="hero">
+  <div class="hero-copy reveal">
+    <p class="eyebrow">AI-powered article intelligence</p>
+    <h1>Read less.<br><em>Understand more.</em></h1>
+    <p class="hero-text">Turn any news article into a clear brief with key themes, sentiment, entities, and a visual snapshot — in seconds.</p>
+    <form class="url-form" method="post" action="{{ url_for('analyze') }}">
+      <label class="sr-only" for="url">Article URL</label>
+      <input id="url" name="url" type="url" placeholder="Paste an article link to analyze…" required autocomplete="url">
+      <button type="submit"><span>Analyze article</span><b>→</b></button>
+    </form>
+    <p class="form-note">Works best with public English-language news articles.</p>
+  </div>
+  <div class="hero-visual reveal delay-1" aria-hidden="true">
+    <div class="signal-card card-float">
+      <div class="card-top"><span class="pulse"></span><small>ARTICLE SIGNAL</small><span>•••</span></div>
+      <div class="fake-title"></div><div class="fake-title short"></div>
+      <div class="sentiment-line"><span>Sentiment</span><strong>Positive</strong></div>
+      <div class="meter"><i></i></div>
+      <div class="chip-row"><span>Technology</span><span>Markets</span><span>AI</span></div>
+    </div>
+    <div class="mini-stat stat-one"><strong>4 min</strong><span>reading time</span></div>
+    <div class="mini-stat stat-two"><strong>12</strong><span>key entities</span></div>
+  </div>
+</section>
+<section class="feature-section">
+  <p class="eyebrow">One link, the full picture</p>
+  <div class="feature-grid">
+    <article class="feature reveal"><span>01</span><h2>Get the brief</h2><p>A focused AI summary surfaces what matters without the noise.</p></article>
+    <article class="feature reveal delay-1"><span>02</span><h2>See the signal</h2><p>Sentiment, entities, keywords, and article statistics at a glance.</p></article>
+    <article class="feature reveal delay-2"><span>03</span><h2>Take it with you</h2><p>Export a clean PDF report to share or keep for later.</p></article>
+  </div>
+</section>
+<div class="loader" aria-live="polite" aria-label="Analyzing article"><div class="loader-mark">✦</div><p>Reading the story<span></span></p></div>
 {% endblock %}
-</body>
-</html>

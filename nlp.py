@@ -1,44 +1,94 @@
+from collections import Counter
+from io import BytesIO
+from base64 import b64encode
+
 import spacy
 from textblob import TextBlob
+from wordcloud import WordCloud
 
 nlp_model = spacy.load("en_core_web_sm")
 
-def analyze_text(text):
+
+def sentiment_label(score):
+    if score >= 0.6:
+        return "Strongly Positive"
+    if score >= 0.2:
+        return "Positive"
+    if score > -0.2:
+        return "Neutral"
+    if score > -0.6:
+        return "Negative"
+    return "Strongly Negative"
+
+
+def subjectivity_label(score):
+    if score >= 0.75:
+        return "Highly Subjective"
+    if score >= 0.5:
+        return "Somewhat Subjective"
+    if score >= 0.25:
+        return "Somewhat Objective"
+    return "Highly Objective"
+
+
+def extract_keywords(doc, limit=10):
+    terms = [
+        token.lemma_.lower()
+        for token in doc
+        if token.is_alpha and not token.is_stop and not token.is_punct and len(token) > 2
+    ]
+    return [{"text": term, "count": count} for term, count in Counter(terms).most_common(limit)]
+
+
+def create_word_cloud(text):
+    try:
+        image = WordCloud(
+            width=1200,
+            height=600,
+            background_color=None,
+            mode="RGBA",
+            colormap="viridis",
+            stopwords=None,
+            collocations=False,
+        ).generate(text)
+        buffer = BytesIO()
+        image.to_image().save(buffer, format="PNG")
+        return b64encode(buffer.getvalue()).decode("ascii")
+    except ValueError:
+        return None
+
+
+def analyze_text(text, article_summary):
     doc = nlp_model(text)
-    entities = [(ent.text, ent.label_) for ent in doc.ents][:10]
+    entities = []
+    seen_entities = set()
+    for entity in doc.ents:
+        key = (entity.text.strip(), entity.label_)
+        if key[0] and key not in seen_entities:
+            seen_entities.add(key)
+            entities.append({"text": key[0], "label": key[1]})
+        if len(entities) == 12:
+            break
+
     sentiment = TextBlob(text).sentiment
-
-    # Polarity labeling with more categories
-    p = sentiment.polarity
-    if p >= 0.6:
-        polarity_label = "Strongly Positive"
-    elif 0.2 <= p < 0.6:
-        polarity_label = "Slightly Positive"
-    elif -0.2 < p < 0.2:
-        polarity_label = "Neutral"
-    elif -0.6 < p <= -0.2:
-        polarity_label = "Slightly Negative"
-    else:  # p <= -0.6
-        polarity_label = "Strongly Negative"
-
-    # Subjectivity labeling with more categories
-    s = sentiment.subjectivity
-    if s >= 0.75:
-        subjectivity_label = "Highly Subjective (Very Opinionated)"
-    elif 0.5 <= s < 0.75:
-        subjectivity_label = "Somewhat Subjective"
-    elif 0.25 <= s < 0.5:
-        subjectivity_label = "Somewhat Objective"
-    else:  # s < 0.25
-        subjectivity_label = "Highly Objective (Factual)"
+    word_count = len(text.split())
+    entity_counts = Counter(entity["label"] for entity in entities)
+    polarity = round(sentiment.polarity, 2)
+    subjectivity = round(sentiment.subjectivity, 2)
 
     return {
-        "summary": text[:500] + "...",
+        "summary": article_summary or "No summary was generated for this article.",
         "entities": entities,
+        "entity_chart": {"labels": list(entity_counts), "values": list(entity_counts.values())},
+        "keywords": extract_keywords(doc),
+        "word_cloud": create_word_cloud(text),
+        "word_count": word_count,
+        "reading_time": max(1, round(word_count / 200)),
+        "char_count": len(text),
         "sentiment": {
-            "polarity": p,
-            "polarity_label": polarity_label,
-            "subjectivity": s,
-            "subjectivity_label": subjectivity_label
-        }
+            "polarity": polarity,
+            "polarity_label": sentiment_label(polarity),
+            "subjectivity": subjectivity,
+            "subjectivity_label": subjectivity_label(subjectivity),
+        },
     }
