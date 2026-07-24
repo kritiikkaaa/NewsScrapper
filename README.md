@@ -9,7 +9,7 @@ python3 -m pip install -r requirements.txt
 python3 app.py
 ```
 
-Open `http://127.0.0.1:5000`. On first use, NLTK may download the tokenizer required to generate article summaries.
+Open `http://127.0.0.1:5000`.
 
 ## Notes
 

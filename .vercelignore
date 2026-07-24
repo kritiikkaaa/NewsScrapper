@@ -1,0 +1,9 @@
+.git
+.venv
+__pycache__
+*.pyc
+test.py
+.env
+.env.example
+.agents
+.codex

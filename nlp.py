@@ -58,6 +58,14 @@ def create_word_cloud(text):
         return None
 
 
+def create_summary(doc, maximum_sentences=3):
+    """Create a short extractive summary without requiring NLTK data files."""
+    sentences = [sentence.text.strip() for sentence in doc.sents if sentence.text.strip()]
+    if not sentences:
+        return "No summary was generated for this article."
+    return " ".join(sentences[:maximum_sentences])
+
+
 def analyze_text(text, article_summary):
     doc = nlp_model(text)
     entities = []
@@ -77,7 +85,7 @@ def analyze_text(text, article_summary):
     subjectivity = round(sentiment.subjectivity, 2)
 
     return {
-        "summary": article_summary or "No summary was generated for this article.",
+        "summary": article_summary or create_summary(doc),
         "entities": entities,
         "entity_chart": {"labels": list(entity_counts), "values": list(entity_counts.values())},
         "keywords": extract_keywords(doc),
