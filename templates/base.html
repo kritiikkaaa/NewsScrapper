@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>{% block title %}NEWS SCRAPER{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <h1 class="nav-title">NEWS SCRAPER</h1>
+            <a href="{{ url_for('home') }}" class="back-button">← Back</a>
+        </div>
+    </nav>
+
+    <main class="content">
+        {% block content %}{% endblock %}
+    </main>
+</body>
+</html>

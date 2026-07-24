@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>NEWS SCRAPER HOME</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+   {% extends "base.html" %}
+
+{% block title %}Home - News Scraper{% endblock %}
+
+{% block content %}
+<h1>🔍 SCRAPE AND ANALYZE NEWS</h1>
+<form method="POST" action="{{ url_for('analyze') }}">
+    <label for="url">Enter a news article URL:</label><br>
+    <input type="text" name="url" id="url" placeholder="https://example.com/news" required>
+    <button type="submit">Analyze</button>
+</form>
+{% endblock %}
+</body>
+</html>

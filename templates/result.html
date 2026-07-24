@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>MULTIPLE ARTICLE ANALYSIS</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+</head>
+<body>
+   {% extends "base.html" %}
+
+{% block title %}Analysis Results - NEWS SCRAPERr{% endblock %}
+
+{% block content %}
+<h1>🧠 NLP ANALYSIS FOR MULTIPLE ARTICLES</h1>
+
+{% if articles %}
+    {% for article in articles %}
+        {% if 'error' in article %}
+            <p>Error loading article at URL: {{ article.url }} — {{ article.error }}</p>
+        {% else %}
+            <div class="article">
+                <h2><a href="{{ article.url }}" target="_blank">{{ article.title }}</a></h2>
+                <p><strong>Summary:</strong> {{ article.summary }}</p>
+                <!-- <p><strong>Sentiment:</strong> Polarity: {{ article.sentiment.polarity }}, Subjectivity: {{ article.sentiment.subjectivity }}</p> -->
+               <p><strong>Sentiment:</strong></p>
+<ul>
+  <li>Polarity: {{ article.sentiment.polarity }} ({{ article.sentiment.polarity_label }})</li>
+  <li>Subjectivity: {{ article.sentiment.subjectivity }} ({{ article.sentiment.subjectivity_label }})</li>
+</ul>
+
+                <p><strong>Entities:</strong>
+                    {% for entity, label in article.entities %}
+                        <span class="entity">{{ entity }} ({{ label }})</span>{% if not loop.last %}, {% endif %}
+                    {% endfor %}
+                </p>
+            </div>
+        {% endif %}
+    {% endfor %}
+{% else %}
+    <p>No articles found.</p>
+{% endif %}
+{% endblock %}
+
+</body>
+</html>
+
